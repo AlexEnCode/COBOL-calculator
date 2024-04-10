@@ -27,13 +27,30 @@
        01  BOUCLE      PIC 9(2) VALUE 0.
        01  CHECKLENGTH PIC 99 VALUE 0.
 
+      *date time management
+       01  WS-DATE.
+           05  WS-DAY       PIC 99.
+           05 FILLER        PIC X VALUE '/'. 
+           05  WS-MONTH     PIC 99.
+           05 FILLER        PIC X VALUE '/'. 
+           05  WS-YEAR      PIC 9(4).
+       01  DATE-STRING      PIC X(8).
+       01  WS-TIME.
+           05  WS-HOUR      PIC 99.
+           05 FILLER        PIC X VALUE ':'. 
+           05  WS-MINUTE    PIC 99.
+           05 FILLER        PIC X VALUE ':'. 
+           05  WS-SECOND    PIC 99.
+
        PROCEDURE DIVISION.
       
       * Menuing
 
+
            DISPLAY " ------------------------------------------------".
            DISPLAY "|              Calculatrice  COBOL               |".
            DISPLAY " ------------------------------------------------".
+
 
            DISPLAY "Entrez une première valeur, un opérateur puis".  
            DISPLAY "une seconde valeur".
@@ -101,6 +118,19 @@
            DISPLAY A-VIEW SPACE OPERATOR SPACE B-VIEW
            SPACE "=" SPACE RESULT
            END-IF.
+           DISPLAY " ------------------------------------------------".
+      * affichage date et heure
+           ACCEPT DATE-STRING FROM DATE YYYYMMDD.
+           MOVE DATE-STRING(1:4) TO WS-YEAR.
+           MOVE DATE-STRING(5:2) TO WS-MONTH.
+           MOVE  DATE-STRING(7:2) TO  WS-DAY.
+           DISPLAY "Le calcul a été fait le:" SPACE WS-DATE.
+         
+           MOVE FUNCTION WHEN-COMPILED(9:2) TO WS-HOUR.
+           MOVE FUNCTION WHEN-COMPILED(11:2) TO WS-MINUTE.
+           MOVE FUNCTION WHEN-COMPILED(13:2) TO WS-SECOND.
+           DISPLAY "Compilé à :" SPACE WS-TIME.
+
       * Si on ne souhaite pas continuer, ferme le programme
            DISPLAY " ------------------------------------------------".
            DISPLAY "Continuer? (y/n)".
@@ -158,3 +188,4 @@
             ACCEPT NBR-A
            END-IF.
            EXIT.
+
