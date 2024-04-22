@@ -1,13 +1,24 @@
+      *=============================================================*
+      * CALCULATRICE:                                               *
+      *    L'objectif: Concevoir un programme permettant d'imiter le*
+      *    fonctionnement d'une calculatrice.                       *
+      *    Les étapes:                                              *        
+      *    Je demande à l'utilisateur de saisir l'opération qu'il   *
+      *    veut faire, puis les chiffres qu'il veut mettre en oeuvre*
+      *    je teste les données reçues et boucle sur la saisie si ko*
+      *    Je calcule le résultat                                   *
+      *    J'affiche l'opération et le résultat                     *
+      *    auteur : AlexEnCode                                      *
+      *    Date création 08/04/2024                                 *
+      *=============================================================*
+
+      ***************************************************************
+      *               identification et déclarations                *
+      ***************************************************************         
+
        IDENTIFICATION DIVISION.
        PROGRAM-ID. calc.
-
-      * Programme permettant d’imiter une
-      *calculatrice exécutant les opérations suivantes :
-      * ● Additionner
-      * ● Soustraire
-      * ● Multiplier
-      * ● Diviser
-      * ● [Bonus] Puissance
+       AUTHOR. AlexEnCode
 
        DATA DIVISION.
        WORKING-STORAGE SECTION.
@@ -15,37 +26,43 @@
       * Ensemble des datas. Les views seront les valeurs affichées en
       * terminal.
 
-       01  NBR-A       PIC S9(3)V9(2) VALUE 0.
-       01  A-VIEW      PIC ZZ9.99.
-       01  NBR-B       PIC S9(3)V9(2) VALUE 0.
-       01  B-VIEW      PIC ZZ9.99.
-       01  RESULT      PIC S9(6)V9(2) VALUE 0.
-       01  R-VIEW      PIC ZZ9.99.
-       01  EXITCODE    PIC x(1) VALUE SPACE.
-       01  OPERATOR    PIC x(1) VALUE "+".
-       01  CHOICE      PIC x(1) VALUE "+".
-       01  BOUCLE      PIC 9(2) VALUE 0.
-       01  CHECKLENGTH PIC 99 VALUE 0.
+       01  WS-NBR-A            PIC S9(3)V9(2) VALUE 0.
+       01  WS-A-VIEW           PIC ZZ9.99.
+       01  WS-NBR-B            PIC S9(3)V9(2) VALUE 0.
+       01  WS-B-VIEW           PIC ZZ9.99.
+       01  WS-RESULT           PIC S9(6)V9(2) VALUE 0.
+       01  WS-R-VIEW           PIC ZZ9.99.
+       01  WS-EXITCODE         PIC x(1)       VALUE SPACE.
+       01  WS-OPERATOR         PIC x(1)       VALUE "+".
+       01  WS-CHOICE           PIC x(1)       VALUE "+".
+       01  WS-BOUCLING         PIC 9          VALUE 0.
+       01  WS-FINISHED         PIC 9          VALUE 1.
+       01  WS-CHECKLENGTH      PIC 99         VALUE 0.
+       01  WS-NUMBER-ENTRY     PIC X(13)      VALUE "NOMBRE    :  ".
+       01  ws-OPERATEUR-ENTRY  PIC X(13)      VALUE "OPERATEUR :  ".
 
       *date time management
        01  WS-DATE.
            05  WS-DAY       PIC 99.
-           05 FILLER        PIC X VALUE '/'. 
+           05 FILLER        PIC X          VALUE '/'. 
            05  WS-MONTH     PIC 99.
-           05 FILLER        PIC X VALUE '/'. 
+           05 FILLER        PIC X          VALUE '/'. 
            05  WS-YEAR      PIC 9(4).
        01  DATE-STRING      PIC X(8).
+
        01  WS-TIME.
            05  WS-HOUR      PIC 99.
-           05 FILLER        PIC X VALUE ':'. 
+           05 FILLER        PIC X          VALUE ':'. 
            05  WS-MINUTE    PIC 99.
-           05 FILLER        PIC X VALUE ':'. 
+           05 FILLER        PIC X          VALUE ':'. 
            05  WS-SECOND    PIC 99.
 
+      **************************************************************
+      * Exécution du programme                                      
+      **************************************************************
        PROCEDURE DIVISION.
       
-      * Menuing
-
+      *0000-MAIN-START.
 
            DISPLAY " ------------------------------------------------".
            DISPLAY "|              Calculatrice  COBOL               |".
@@ -61,36 +78,37 @@
            DISPLAY "- Multiplication: x".
            DISPLAY "- Puissance:      p".
            DISPLAY " ------------------------------------------------".
-           DISPLAY "Entrez votre calcul:"
+           DISPLAY "Entrez votre calcul:".
+           DISPLAY SPACE.
 
       * Saisie de la valeur A, servant de base
 
-           DISPLAY SPACE.          
-           ACCEPT NBR-A.
-           MOVE NBR-A TO A-VIEW.
+           DISPLAY WS-NUMBER-ENTRY WITH NO ADVANCING.          
+           ACCEPT WS-NBR-A.
+           MOVE WS-NBR-A TO WS-A-VIEW.
    
-      * Le Programme bouclera 20 fois. Il sera possible de sortir après
-      * chaque calcul.
+      * Le Programme bouclera 20 fois. Il sera possible de sortir 
+      * après chaque calcul.
 
-           PERFORM 8000-begin
-           THRU 8000-end
-           UNTIL  BOUCLE = 20
-           stop run.
+           PERFORM 1000-BEGIN
+           THRU 1000-END
+           UNTIL WS-BOUCLING = WS-FINISHED.
+           STOP RUN.
 
-       8000-begin.
-           ADD 1 TO BOUCLE.
+       1000-begin.
 
       * Un operateur sur les 5 proposés
-           ACCEPT OPERATOR.
+           DISPLAY WS-OPERATEUR-ENTRY WITH NO ADVANCING. 
+           ACCEPT WS-OPERATOR.
 
       * Deuxieme valeur ref: 
-
-           ACCEPT NBR-B.
-           MOVE NBR-B TO B-VIEW.
-           MOVE OPERATOR TO CHOICE.
+           DISPLAY WS-NUMBER-ENTRY WITH NO ADVANCING. 
+           ACCEPT WS-NBR-B.
+           MOVE WS-NBR-B TO WS-B-VIEW.
+           MOVE WS-OPERATOR TO WS-CHOICE.
       
       * Switch: selon opérateur, calcul différent
-           EVALUATE CHOICE
+           EVALUATE WS-CHOICE
                WHEN '+' 
                    PERFORM ADDITIONS
                WHEN '-'
@@ -101,7 +119,7 @@
                   PERFORM DIVISIONS
                WHEN 'p'
                   PERFORM PUISSANCES
-               WHEN 'end'
+               WHEN 'END'
                   PERFORM BYEBYE 
                WHEN OTHER
                    DISPLAY "Operateur inexistant."
@@ -111,15 +129,85 @@
       * si positif, valeur calculée  
            DISPLAY " ------------------------------------------------".
 
-           IF RESULT >= 0
-           DISPLAY A-VIEW SPACE OPERATOR SPACE B-VIEW
-           SPACE "=" SPACE R-VIEW
+           IF WS-RESULT >= 0
+           DISPLAY WS-A-VIEW SPACE WS-OPERATOR SPACE WS-B-VIEW
+           SPACE "=" SPACE WS-R-VIEW
            ELSE
-           DISPLAY A-VIEW SPACE OPERATOR SPACE B-VIEW
-           SPACE "=" SPACE RESULT
+           DISPLAY WS-A-VIEW SPACE WS-OPERATOR SPACE WS-B-VIEW
+           SPACE "=" SPACE WS-RESULT
            END-IF.
            DISPLAY " ------------------------------------------------".
-      * affichage date et heure
+
+       CALCULTIMING.
+
+      * Si on ne souhaite pas continuer, ferme le programme
+           DISPLAY " ------------------------------------------------".
+           DISPLAY "Continuer? (Y/N)".
+           ACCEPT  WS-EXITCODE.
+           MOVE FUNCTION UPPER-CASE (WS-EXITCODE) TO WS-EXITCODE.
+           DISPLAY " ------------------------------------------------".
+           IF WS-EXITCODE NOT EQUAL "N"
+      * Si l'on souhaite continuer avec le reustat,
+      *  réatribue le resultat a nbr-A.
+
+           PERFORM CONTINUEWITHRESULT
+           ELSE
+           SET WS-BOUCLING TO WS-FINISHED
+           STOP RUN
+           END-IF.
+           
+       1000-END.
+ 
+      *=============================================================*
+
+      ***************************************************************
+      *                  Paragraphes de méthodes                    *
+      ***************************************************************
+
+       BYEBYE.
+           STOP RUN.
+       ADDITIONS.
+           ADD WS-NBR-A TO WS-NBR-B GIVING WS-RESULT.
+           MOVE WS-RESULT TO WS-R-VIEW.
+           EXIT.
+
+       SOUSTRACTIONS.
+           SUBTRACT WS-NBR-B FROM WS-NBR-A GIVING WS-RESULT.
+           EXIT.
+
+       MULTIPLICATIONS.
+           MULTIPLY WS-NBR-A BY WS-NBR-B GIVING WS-RESULT.
+           MOVE WS-RESULT TO WS-R-VIEW.
+           EXIT.
+
+       DIVISIONS.
+             IF WS-NBR-B NOT = 0
+             DIVIDE WS-NBR-A BY WS-NBR-B GIVING WS-RESULT
+             MOVE WS-RESULT TO WS-R-VIEW
+             ELSE
+             DISPLAY "division par 0 impossible"
+             END-IF.
+             EXIT.
+
+       PUISSANCES.
+             COMPUTE WS-RESULT = WS-NBR-A ** WS-NBR-B
+             MOVE WS-RESULT TO WS-R-VIEW.
+           EXIT.
+           
+       CONTINUEWITHRESULT.
+           DISPLAY "Continuer avec" SPACE WS-R-VIEW "? (y/n)".
+           ACCEPT  WS-EXITCODE.
+           MOVE FUNCTION UPPER-CASE (WS-EXITCODE) TO WS-EXITCODE
+           IF WS-EXITCODE NOT EQUAL "N"
+            SET WS-NBR-A TO WS-RESULT
+            DISPLAY WS-NBR-A
+           ELSE
+            DISPLAY "Nouveau calcul :"
+            ACCEPT WS-NBR-A
+           END-IF.
+           EXIT.
+
+       CALCULTIMING.
            ACCEPT DATE-STRING FROM DATE YYYYMMDD.
            MOVE DATE-STRING(1:4) TO WS-YEAR.
            MOVE DATE-STRING(5:2) TO WS-MONTH.
@@ -129,63 +217,5 @@
            MOVE FUNCTION WHEN-COMPILED(9:2) TO WS-HOUR.
            MOVE FUNCTION WHEN-COMPILED(11:2) TO WS-MINUTE.
            MOVE FUNCTION WHEN-COMPILED(13:2) TO WS-SECOND.
-           DISPLAY "Compilé à :" SPACE WS-TIME.
-
-      * Si on ne souhaite pas continuer, ferme le programme
-           DISPLAY " ------------------------------------------------".
-           DISPLAY "Continuer? (y/n)".
-           ACCEPT  EXITCODE.
-           DISPLAY " ------------------------------------------------".
-           IF EXITCODE NOT EQUAL "n"
-      * Si l'on souhaite continuer avec le reustat,
-      *  réatribue le resultat a nbr-A.
-
-           PERFORM CONTINUEWITHRESULT
-           ELSE
-           STOP RUN
-           END-IF.
-           
-       8000-end.
- 
-      * Paragraphes de méthodes 
-       BYEBYE.
-           STOP RUN.
-       ADDITIONS.
-           ADD NBR-A TO NBR-B GIVING RESULT.
-           MOVE RESULT TO R-VIEW.
-           EXIT.
-
-       SOUSTRACTIONS.
-           SUBTRACT NBR-B FROM NBR-A GIVING RESULT.
-           EXIT.
-
-       MULTIPLICATIONS.
-           MULTIPLY NBR-A BY NBR-B GIVING RESULT.
-           MOVE RESULT TO R-VIEW.
-           EXIT.
-
-       DIVISIONS.
-             IF NBR-B NOT = 0
-             DIVIDE NBR-A BY NBR-B GIVING RESULT
-             MOVE RESULT TO R-VIEW
-             ELSE
-             DISPLAY "division par 0 impossible"
-             END-IF.
-
-       PUISSANCES.
-             COMPUTE RESULT = NBR-A ** NBR-B
-             MOVE RESULT TO R-VIEW.
-           EXIT.
-           
-       CONTINUEWITHRESULT.
-           DISPLAY "Continuer avec" SPACE R-VIEW "? (y/n)".
-           ACCEPT  EXITCODE.
-           IF EXITCODE NOT EQUAL "n"
-            SET NBR-A TO RESULT
-            DISPLAY NBR-A
-           ELSE
-            DISPLAY "Nouveau calcul :"
-            ACCEPT NBR-A
-           END-IF.
-           EXIT.
-
+           DISPLAY "Compilé à :" SPACE WS-TIME.    
+    
